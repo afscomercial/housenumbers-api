@@ -17,10 +17,13 @@ COPY src ./src
 RUN npm run build
 
 # ---------- download quantised model ----------
-# change URL if you prefer a different quant
+ARG HF_TOKEN
+ENV HF_TOKEN=$HF_TOKEN
+
 RUN mkdir -p /app/models && \
-    wget -q https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat-q4_K_S.gguf \
-        -O /app/models/llama-2-7b-chat.Q4_K_S.gguf
+    curl -L -H "Authorization: Bearer $HF_TOKEN" \
+    https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_S.gguf \
+    --output /app/models/llama-2-7b-chat.Q4_K_S.gguf
 
 # non-root
 RUN useradd --system --uid 1001 nodejs
