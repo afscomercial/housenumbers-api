@@ -33,7 +33,6 @@ API_URL=${{RAILWAY_STATIC_URL}}
 
 ## Model File Handling
 
-✅ **With 8GB RAM Plan**: Your plan supports the full model deployment!
 
 The Dockerfile expects the LLM model file to be present at:
 ```
@@ -44,7 +43,7 @@ The Dockerfile expects the LLM model file to be present at:
 - Build resources: 6GB RAM, 6 vCPU for compilation
 - Runtime resources: 4GB RAM, 4 vCPU for model inference  
 - Model file is included in Docker image (3.8GB)
-- Fixed `.dockerignore` to include model file
+
 
 
 ## Deployment Steps
