@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { App } from './app';
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 async function bootstrap() {
   const app = new App();
@@ -9,7 +9,7 @@ async function bootstrap() {
   try {
     await app.initialize();
     
-    const server = app.app.listen(PORT, () => {
+    const server = app.app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
       console.log(`Health check: http://localhost:${PORT}/health`);
