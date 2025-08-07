@@ -12,9 +12,9 @@
       "MODEL_PATH": "/app/models/llama-2-7b-chat.Q4_K_S.gguf",
       "MODEL_CONTEXT_SIZE": "2048",
       "MODEL_GPU_LAYERS": "0",
-      "JWT_SECRET": "${{ JWT_SECRET }}",
-      "JWT_EXPIRES_IN": "${{ JWT_EXPIRES_IN }}",
-      "HF_TOKEN": "${{ HF_TOKEN }}"
+      "JWT_SECRET": "${{ shared.JWT_SECRET }}",
+      "JWT_EXPIRES_IN": "24h",
+      "HF_TOKEN": "${{ shared.HF_TOKEN }}"
     }
   }
 }
