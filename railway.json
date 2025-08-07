@@ -16,9 +16,9 @@
         "JWT_EXPIRES_IN": "24h",
         "MODEL_PATH": "/app/models/llama-2-7b-chat.Q4_K_S.gguf",
         "DATABASE_PATH": "/app/database",
-        "JWT_SECRET":"${{ JWT_SECRET }}",
-        "AUTH_USERNAME":"${{ AUTH_USERNAME }}",
-        "AUTH_PASSWORD":"${{ AUTH_PASSWORD }}"
+        "JWT_SECRET":"dsujn324daw",
+        "AUTH_USERNAME":"admin",
+        "AUTH_PASSWORD":"password"
       }
     }
   }
