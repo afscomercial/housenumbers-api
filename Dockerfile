@@ -1,54 +1,35 @@
-# Use Node.js 22 Alpine as base image
-FROM node:22-alpine as builder
+# Use Node.js 20 LTS for better compatibility
+FROM node:20-slim
 
-# Set working directory
-WORKDIR /app
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies required for native modules
-RUN apk add --no-cache python3 make g++ cmake --timeout=300
+# Create non-root user
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 nodejs
 
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install all dependencies (including dev dependencies for building)
+# Install dependencies and build
 RUN npm ci && npm cache clean --force
 
-# Copy source code
+# Copy source code and build
 COPY src ./src
-
-# Build the application
 RUN npm run build
 
-# Production stage
-FROM node:22-alpine
-
-# Install minimal runtime dependencies
-RUN apk add --no-cache python3 && rm -rf /var/cache/apk/*
-
-# Create app directory
-WORKDIR /app
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
-
-# Copy built application
-COPY --from=builder /app/dist ./dist
-
-# Copy ESM subprocess script
+# Copy ESM subprocess script to the correct location
 COPY src/infrastructure/llm/llama-subprocess.mjs ./dist/infrastructure/llm/
 
 # Copy model file if it exists
 COPY src/models/ ./models/
 
-# Create directories for data and models
+# Create directories and set permissions
 RUN mkdir -p data models && \
     chown -R nodejs:nodejs /app
 
