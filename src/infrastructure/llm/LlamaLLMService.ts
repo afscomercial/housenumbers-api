@@ -151,21 +151,38 @@ export class LlamaLLMService implements SummaryService {
       `USER: Summarise in one sentence (≤ 40 words):\n\n${text.trim()}`;
 
     try {
+      console.log("[generateSummary] Getting session...");
       const session = await getSession();
+      
+      console.log("[generateSummary] Starting prompt generation...");
+      const promptStart = Date.now();
+      
       const reply = await session.prompt(prompt, {
-        maxTokens: 60,
-        temperature: 0.5,
+        maxTokens: 30,  // Reduced for faster generation
+        temperature: 0.3,  // Reduced for more deterministic output
       });
+      
+      const promptTime = Date.now() - promptStart;
+      console.log(`[generateSummary] Prompt completed in ${promptTime}ms`);
+      console.log(`[generateSummary] Raw reply: "${reply}"`);
 
       const cleaned =
         reply
           .replace(/^[^\n]*\n/, "")
           .split(".")[0]
           .trim() + ".";
-      return cleaned.endsWith(".") ? cleaned : cleaned + ".";
+      
+      const result = cleaned.endsWith(".") ? cleaned : cleaned + ".";
+      console.log(`[generateSummary] Cleaned result: "${result}"`);
+      return result;
     } catch (err) {
       console.error("[LlamaLLMService] generation error", err);
-      throw new InternalServerError("Failed to generate summary with Llama");
+      
+      // Fallback to simple text truncation
+      console.log("[generateSummary] Using fallback summary");
+      const words = text.trim().split(/\s+/);
+      const summary = words.slice(0, 20).join(' ') + (words.length > 20 ? '...' : '.');
+      return `Summary: ${summary}`;
     }
   }
 
