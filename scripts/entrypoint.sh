@@ -2,7 +2,20 @@
 set -e
 
 # ---------------------------------------------------------------------------
-# 1. Download model if not present
+# 1. validate environment variables
+# ---------------------------------------------------------------------------
+echo "[entrypoint] JWT_SECRET present? $( [ -n "$JWT_SECRET" ] && echo yes || echo no )"
+echo "[entrypoint] JWT_EXPIRES_IN present? $( [ -n "$JWT_EXPIRES_IN" ] && echo yes || echo no )"
+echo "[entrypoint] AUTH_USERNAME present? $( [ -n "$AUTH_USERNAME" ] && echo yes || echo no )"
+echo "[entrypoint] AUTH_PASSWORD present? $( [ -n "$AUTH_PASSWORD" ] && echo yes || echo no )"
+echo "[entrypoint] DATABASE_PATH present? $( [ -n "$DATABASE_PATH" ] && echo yes || echo no )"
+echo "[entrypoint] MODEL_PATH present? $( [ -n "$MODEL_PATH" ] && echo yes || echo no )"
+echo "[entrypoint] MODEL_CONTEXT_SIZE present? $( [ -n "$MODEL_CONTEXT_SIZE" ] && echo yes || echo no )"
+echo "[entrypoint] MODEL_GPU_LAYERS present? $( [ -n "$MODEL_GPU_LAYERS" ] && echo yes || echo no )"
+
+
+# ---------------------------------------------------------------------------
+# 2. Download model if not present
 # ---------------------------------------------------------------------------
 if [ ! -f "$MODEL_PATH" ]; then
   echo "[entrypoint] Model not found - downloading GGUF…"
@@ -20,7 +33,7 @@ if [ ! -f "$MODEL_PATH" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# 2. validate environment variables
+# 3. validate environment variables
 # ---------------------------------------------------------------------------
 echo "[entrypoint] JWT_SECRET present? $( [ -n "$JWT_SECRET" ] && echo yes || echo no )"
 echo "[entrypoint] JWT_EXPIRES_IN present? $( [ -n "$JWT_EXPIRES_IN" ] && echo yes || echo no )"
