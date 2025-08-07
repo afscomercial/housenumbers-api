@@ -35,11 +35,6 @@ export class App {
   }
 
   async initialize(): Promise<void> {
-    // Initialize services with environment variables
-    console.log('All env vars starting with JWT:', Object.keys(process.env).filter(k => k.startsWith('JWT')));
-    console.log('JWT_SECRET from process.env:', process.env.JWT_SECRET);
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('All env vars:', process.env);
 
     this.jwtService = new JWTService(
       process.env.JWT_SECRET,

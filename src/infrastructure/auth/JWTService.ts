@@ -7,8 +7,6 @@ export class JWTService {
   private readonly expiresIn: string;
 
   constructor(secret?: string, expiresIn: string = '24h') {
-    console.log('Available env vars:', Object.keys(process.env).filter(k => k.includes('JWT')));
-    console.log('JWT_SECRET value:', secret);
     if (!secret) {
       throw new Error('JWT_SECRET is required');
     }
