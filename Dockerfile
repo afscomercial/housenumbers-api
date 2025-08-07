@@ -1,37 +1,33 @@
 # syntax=docker/dockerfile:1
 FROM node:20-slim
 
-WORKDIR /app
-
-# deps for node-llama-cpp native build + wget
+# --------- basic build deps for node-llama-cpp native addon + curl ----------
 RUN apt-get update && \
-    apt-get install -y python3 make g++ wget && \
+    apt-get install -y python3 make g++ curl && \
     rm -rf /var/lib/apt/lists/*
 
-# install all deps (needed for TypeScript build)
+# --------- app source ----------
+WORKDIR /app
 COPY package*.json tsconfig.json ./
-RUN npm ci
+RUN npm ci --omit=dev
 
-# copy source & build
 COPY src ./src
-RUN npm run build
+RUN npm run build         # outputs to dist/
 
-# ---------- download quantised model ----------
-ARG HF_TOKEN
-ENV HF_TOKEN=$HF_TOKEN
+# --------- runtime downloader entrypoint ----------
+COPY scripts/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-RUN mkdir -p /app/models && \
-    curl -L -H "Authorization: Bearer $HF_TOKEN" \
-    https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_S.gguf \
-    --output /app/models/llama-2-7b-chat.Q4_K_S.gguf
-
-# non-root
+# --------- non-root user ----------
 RUN useradd --system --uid 1001 nodejs
 USER nodejs
 
+# --------- default envs (override in Railway Variables) ----------
 ENV NODE_ENV=production \
     PORT=3000 \
-    MODEL_PATH=/app/models/llama-2-7b-chat.Q4_K_S.gguf
+    MODEL_PATH=/app/models/llama-2-7b-chat.Q4_K_S.gguf \
+    MODEL_CONTEXT_SIZE=2048 \
+    MODEL_GPU_LAYERS=0
 
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+CMD ["/app/entrypoint.sh"]
