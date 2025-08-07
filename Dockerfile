@@ -31,7 +31,11 @@ ENV NODE_ENV=production \
     PORT=3000 \
     MODEL_PATH=/app/models/llama-2-7b-chat.Q4_K_S.gguf \
     MODEL_CONTEXT_SIZE=2048 \
-    MODEL_GPU_LAYERS=0 
+    MODEL_GPU_LAYERS=0 \
+    AUTH_PASSWORD=password \
+    AUTH_USERNAME=admin \
+    JWT_SECRET=dsujn324daw \
+    JWT_EXPIRES_IN=24h
 
 EXPOSE 3000
 CMD ["/app/entrypoint.sh"]
