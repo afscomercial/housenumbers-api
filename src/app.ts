@@ -35,19 +35,41 @@ export class App {
   }
 
   async initialize(): Promise<void> {
-
-    this.jwtService = new JWTService(
-      process.env.JWT_SECRET,
-      process.env.JWT_EXPIRES_IN || '24h'
-    );
-    this.llamaService = new LlamaLLMService();
-    
-    await this.initializeDatabase();
-    await this.setupMiddlewares();
-    await this.setupRoutes();
-    await this.setupSwagger();
-    await this.setupErrorHandling();
-    await this.seedDefaultUser();
+    try {
+      console.log('Starting app initialization...');
+      
+      this.jwtService = new JWTService(
+        process.env.JWT_SECRET,
+        process.env.JWT_EXPIRES_IN || '24h'
+      );
+      console.log('JWT Service initialized');
+      
+      this.llamaService = new LlamaLLMService();
+      console.log('Llama Service initialized');
+      
+      await this.initializeDatabase();
+      console.log('Database initialized');
+      
+      await this.setupMiddlewares();
+      console.log('Middlewares set up');
+      
+      await this.setupRoutes();
+      console.log('Routes set up');
+      
+      await this.setupSwagger();
+      console.log('Swagger set up');
+      
+      await this.setupErrorHandling();
+      console.log('Error handling set up');
+      
+      await this.seedDefaultUser();
+      console.log('Default user seeded');
+      
+      console.log('App initialization completed successfully');
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+      throw error;
+    }
   }
 
   private async initializeDatabase(): Promise<void> {
