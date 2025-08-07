@@ -4,18 +4,7 @@
   "deploy": {
     "healthcheckPath": "/health",
     "memoryLimit": 8192,
-    "cpuLimit": 8000,
-     "variables": {
-      "NODE_ENV": "production",
-      "PORT": "3000",
-      "DATABASE_PATH": "/app/data/database.sqlite",
-      "MODEL_PATH": "/app/models/llama-2-7b-chat.Q4_K_S.gguf",
-      "MODEL_CONTEXT_SIZE": "2048",
-      "MODEL_GPU_LAYERS": "0",
-      "JWT_SECRET": "dsujn324daw",
-      "JWT_EXPIRES_IN": "24h",
-      "HF_TOKEN": "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"
-    }
+    "cpuLimit": 8000
   }
 }
 
