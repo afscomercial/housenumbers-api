@@ -32,22 +32,47 @@ async function loadLlamaExports(): Promise<LlamaExports> {
 }
 
 async function getSession(): Promise<LlamaChatSession> {
-  if (chatSession) return chatSession;
+  if (chatSession) {
+    console.log("[getSession] Returning existing chat session");
+    return chatSession;
+  }
 
+  console.log(`[getSession] Initializing new session, MODEL_PATH: ${MODEL_PATH}`);
+  
   if (!fs.existsSync(MODEL_PATH)) {
+    console.error(`[getSession] Model file not found at: ${MODEL_PATH}`);
     throw new InternalServerError(`GGUF model not found at ${MODEL_PATH}`);
   }
 
+  const modelStats = fs.statSync(MODEL_PATH);
+  console.log(`[getSession] Model file size: ${(modelStats.size / 1024 / 1024 / 1024).toFixed(2)} GB`);
+
+  console.log("[getSession] Loading Llama exports...");
   const { getLlama } = await loadLlamaExports();
+  
+  console.log("[getSession] Getting Llama instance...");
+  const startTime = Date.now();
   const llama = await (getLlama as GetLlamaFn)();
+  console.log(`[getSession] Llama instance created in ${Date.now() - startTime}ms`);
 
+  console.log("[getSession] Loading model...");
+  const modelStartTime = Date.now();
   const model = await llama.loadModel({ modelPath: MODEL_PATH });
-  const context = await model.createContext({ contextSize: CONTEXT_SIZE });
+  console.log(`[getSession] Model loaded in ${Date.now() - modelStartTime}ms`);
 
+  console.log(`[getSession] Creating context with size ${CONTEXT_SIZE}...`);
+  const contextStartTime = Date.now();
+  const context = await model.createContext({ contextSize: CONTEXT_SIZE });
+  console.log(`[getSession] Context created in ${Date.now() - contextStartTime}ms`);
+
+  console.log("[getSession] Creating chat session...");
   const { LlamaChatSession } = await loadLlamaExports();
   chatSession = new LlamaChatSession({
     contextSequence: context.getSequence(),
   });
+  
+  const totalTime = Date.now() - startTime;
+  console.log(`[getSession] Chat session initialized successfully in ${totalTime}ms`);
   return chatSession;
 }
 
@@ -68,8 +93,16 @@ export class LlamaLLMService implements SummaryService {
     return new Promise((resolve, reject) => {
       // Add timeout
       const timeoutId = setTimeout(() => {
-        reject(new InternalServerError("Summary generation timed out after 30 seconds"));
-      }, 30000);
+        console.error("[LlamaLLMService] Timeout reached - checking memory usage");
+        const memUsage = process.memoryUsage();
+        console.error("Memory usage:", {
+          rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+          heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+          heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+          external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`
+        });
+        reject(new InternalServerError("Summary generation timed out after 60 seconds"));
+      }, 60000);
 
       const wrappedResolve = (value: string) => {
         clearTimeout(timeoutId);
