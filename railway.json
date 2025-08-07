@@ -5,22 +5,6 @@
     "healthcheckPath": "/health",
     "memoryLimit": 8192,
     "cpuLimit": 8000
-  },
-  "environments": {
-    "production": {
-      "variables": {
-        "NODE_ENV": "production",
-        "PORT": "3000",
-        "MODEL_CONTEXT_SIZE": "2048",
-        "MODEL_GPU_LAYERS": "0",
-        "JWT_EXPIRES_IN": "24h",
-        "MODEL_PATH": "/app/models/llama-2-7b-chat.Q4_K_S.gguf",
-        "DATABASE_PATH": "/app/database",
-        "JWT_SECRET":"dsujn324daw",
-        "AUTH_USERNAME":"admin",
-        "AUTH_PASSWORD":"password"
-      }
-    }
   }
 }
 
