@@ -8,10 +8,6 @@ if [ ! -f "$MODEL_PATH" ]; then
   echo "[entrypoint] Model not found - downloading GGUF…"
   mkdir -p "$(dirname "$MODEL_PATH")"
 
-  if [ -z "$HF_TOKEN" ]; then
-    echo "[entrypoint] ERROR: HF_TOKEN env var is empty; cannot download model."
-    exit 1
-  fi
 
   curl -L -H "Authorization: Bearer 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" \
        https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_S.gguf \
