@@ -55,9 +55,64 @@ async function getSession(): Promise<LlamaChatSession> {
 // Concrete service that your DI / SummaryService already expects
 // --------------------------------------------------------------------
 export class LlamaLLMService implements SummaryService {
+  private processingQueue: Array<{
+    text: string;
+    resolve: (value: string) => void;
+    reject: (error: Error) => void;
+  }> = [];
+  private isProcessing = false;
+
   async summarize(text: string): Promise<string> {
     if (!text?.trim()) throw new Error("Text cannot be empty");
 
+    return new Promise((resolve, reject) => {
+      // Add timeout
+      const timeoutId = setTimeout(() => {
+        reject(new InternalServerError("Summary generation timed out after 30 seconds"));
+      }, 30000);
+
+      const wrappedResolve = (value: string) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      };
+
+      const wrappedReject = (error: Error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      };
+
+      this.processingQueue.push({
+        text,
+        resolve: wrappedResolve,
+        reject: wrappedReject
+      });
+
+      this.processQueue();
+    });
+  }
+
+  private async processQueue(): Promise<void> {
+    if (this.isProcessing || this.processingQueue.length === 0) return;
+    
+    this.isProcessing = true;
+    
+    while (this.processingQueue.length > 0) {
+      const { text, resolve, reject } = this.processingQueue.shift()!;
+      
+      try {
+        console.log(`[LlamaLLMService] Processing queue item (${this.processingQueue.length} remaining)`);
+        const result = await this.generateSummary(text);
+        resolve(result);
+      } catch (error) {
+        console.error("[LlamaLLMService] Queue processing error:", error);
+        reject(error instanceof Error ? error : new InternalServerError("Unknown error"));
+      }
+    }
+    
+    this.isProcessing = false;
+  }
+
+  private async generateSummary(text: string): Promise<string> {
     const prompt =
       "SYSTEM: Respond with exactly one sentence—no greeting, no intro.\n" +
       `USER: Summarise in one sentence (≤ 40 words):\n\n${text.trim()}`;
@@ -76,7 +131,7 @@ export class LlamaLLMService implements SummaryService {
           .trim() + ".";
       return cleaned.endsWith(".") ? cleaned : cleaned + ".";
     } catch (err) {
-      console.error("[LlamaLLMService] error", err);
+      console.error("[LlamaLLMService] generation error", err);
       throw new InternalServerError("Failed to generate summary with Llama");
     }
   }
