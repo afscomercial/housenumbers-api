@@ -4,8 +4,8 @@ set -e
 # ---------------------------------------------------------------------------
 # 1. validate environment variables
 # ---------------------------------------------------------------------------
-echo "[entrypoint] JWT_SECRET length: ${JWT_SECRET:0:5}..."
-echo "[entrypoint] HF_TOKEN (first 5 chars): ${HF_TOKEN:0:5}..."
+echo "[entrypoint] JWT_SECRET present? $( [ -n "$JWT_SECRET" ] && echo yes || echo no )"
+echo "[entrypoint] JWT_SECRET length: ${JWT_SECRET}"
 echo "[entrypoint] JWT_EXPIRES_IN present? $( [ -n "$JWT_EXPIRES_IN" ] && echo yes || echo no )"
 echo "[entrypoint] AUTH_USERNAME present? $( [ -n "$AUTH_USERNAME" ] && echo yes || echo no )"
 echo "[entrypoint] AUTH_PASSWORD present? $( [ -n "$AUTH_PASSWORD" ] && echo yes || echo no )"

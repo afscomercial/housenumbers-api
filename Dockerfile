@@ -25,12 +25,15 @@ RUN useradd --system --uid 1001 nodejs \
 
 USER nodejs
 
+ARG HF_TOKEN
+
 # --------- default envs (override in Railway Variables) ----------
 ENV NODE_ENV=production \
     PORT=3000 \
     MODEL_PATH=/app/models/llama-2-7b-chat.Q4_K_S.gguf \
     MODEL_CONTEXT_SIZE=2048 \
-    MODEL_GPU_LAYERS=0
+    MODEL_GPU_LAYERS=0 \
+    HF_TOKEN=$HF_TOKEN
 
 EXPOSE 3000
 CMD ["/app/entrypoint.sh"]
