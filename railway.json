@@ -13,7 +13,12 @@
         "PORT": "3000",
         "MODEL_CONTEXT_SIZE": "2048",
         "MODEL_GPU_LAYERS": "0",
-        "JWT_EXPIRES_IN": "24h"
+        "JWT_EXPIRES_IN": "24h",
+        "MODEL_PATH": "/app/models/llama-2-7b-chat.Q4_K_S.gguf",
+        "DATABASE_PATH": "/app/database",
+        "JWT_SECRET":"${{ JWT_SECRET }}",
+        "AUTH_USERNAME":"${{ AUTH_USERNAME }}",
+        "AUTH_PASSWORD":"${{ AUTH_PASSWORD }}"
       }
     }
   }
