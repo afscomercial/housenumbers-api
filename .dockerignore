@@ -40,3 +40,4 @@ docker-compose.*.yml
 
 # Data directories (will be mounted)  
 data/
+# models/*.gguf  # COMMENTED OUT - We want to include the model in the Docker image

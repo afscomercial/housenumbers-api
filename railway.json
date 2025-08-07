@@ -3,7 +3,7 @@
   "build": {
     "builder": "dockerfile",
     "dockerfile": "Dockerfile",
-    "buildCommand": "docker build --memory=6g --cpus=6 -t app ."
+    "buildCommand": "docker build --memory=6g --cpus=6 --network=host -t app ."
   },
   "deploy": {
     "startCommand": "node dist/index.js",
