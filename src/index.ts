@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { App } from './app';
 
-const PORT = parseInt(process.env.PORT || '8080', 10);
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 async function bootstrap() {
   const app = new App();
