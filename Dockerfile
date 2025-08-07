@@ -28,7 +28,7 @@ USER nodejs
 
 # --------- default envs (override in Railway Variables) ----------
 ENV NODE_ENV=production \
-    PORT=3000 \
+    PORT=8080 \
     MODEL_PATH=/app/models/llama-2-7b-chat.Q4_K_S.gguf \
     MODEL_CONTEXT_SIZE=2048 \
     MODEL_GPU_LAYERS=0 \
@@ -37,5 +37,5 @@ ENV NODE_ENV=production \
     JWT_SECRET=dsujn324daw \
     JWT_EXPIRES_IN=24h
 
-EXPOSE 3000
+EXPOSE 8080
 CMD ["/app/entrypoint.sh"]
