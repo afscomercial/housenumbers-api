@@ -19,7 +19,10 @@ COPY scripts/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # --------- non-root user ----------
-RUN useradd --system --uid 1001 nodejs
+RUN useradd --system --uid 1001 nodejs \
+&& mkdir -p /app/models /app/data \
+ && chown -R nodejs:nodejs /app  
+
 USER nodejs
 
 # --------- default envs (override in Railway Variables) ----------
