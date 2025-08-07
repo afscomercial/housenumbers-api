@@ -39,8 +39,8 @@ export class App {
     console.log('All env vars starting with JWT:', Object.keys(process.env).filter(k => k.startsWith('JWT')));
     console.log('JWT_SECRET from process.env:', process.env.JWT_SECRET);
     console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('All env vars count:', Object.keys(process.env).length);
-    
+    console.log('All env vars:', process.env);
+
     this.jwtService = new JWTService(
       process.env.JWT_SECRET,
       process.env.JWT_EXPIRES_IN || '24h'
