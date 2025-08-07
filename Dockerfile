@@ -8,9 +8,9 @@ RUN apt-get update && \
     apt-get install -y python3 make g++ wget && \
     rm -rf /var/lib/apt/lists/*
 
-# install production deps
+# install all deps (needed for TypeScript build)
 COPY package*.json tsconfig.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # copy source & build
 COPY src ./src
