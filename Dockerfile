@@ -5,7 +5,7 @@ FROM node:22-alpine as builder
 WORKDIR /app
 
 # Install system dependencies required for native modules
-RUN apk add --no-cache python3 make g++ cmake
+RUN apk add --no-cache python3 make g++ cmake --timeout=300
 
 # Copy package files
 COPY package*.json ./
@@ -23,13 +23,8 @@ RUN npm run build
 # Production stage
 FROM node:22-alpine
 
-# Install system dependencies for runtime
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    cmake \
-    && rm -rf /var/cache/apk/*
+# Install minimal runtime dependencies
+RUN apk add --no-cache python3 && rm -rf /var/cache/apk/*
 
 # Create app directory
 WORKDIR /app
