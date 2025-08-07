@@ -50,6 +50,9 @@ COPY --from=builder /app/dist ./dist
 # Copy ESM subprocess script
 COPY src/infrastructure/llm/llama-subprocess.mjs ./dist/infrastructure/llm/
 
+# Copy model file if it exists
+COPY src/models/ ./models/ 2>/dev/null || echo "No models directory found"
+
 # Create directories for data and models
 RUN mkdir -p data models && \
     chown -R nodejs:nodejs /app
