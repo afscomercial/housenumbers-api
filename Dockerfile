@@ -51,7 +51,7 @@ COPY --from=builder /app/dist ./dist
 COPY src/infrastructure/llm/llama-subprocess.mjs ./dist/infrastructure/llm/
 
 # Copy model file if it exists
-COPY src/models/ ./models/ 2>/dev/null || echo "No models directory found"
+COPY src/models/ ./models/
 
 # Create directories for data and models
 RUN mkdir -p data models && \
