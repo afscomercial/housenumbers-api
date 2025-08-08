@@ -95,11 +95,13 @@ export class LlamaLLMService implements SummaryService {
     reject: (error: Error) => void;
   }> = [];
   private isProcessing = false;
+  private hasGenerated = false;
 
   async summarize(text: string): Promise<string> {
     if (!text?.trim()) throw new Error("Text cannot be empty");
 
     return new Promise((resolve, reject) => {
+      const firstRunPadding = 180_000;
       // Add timeout
       const timeoutId = setTimeout(() => {
         console.error("[LlamaLLMService] Timeout reached - checking memory usage");
@@ -111,7 +113,7 @@ export class LlamaLLMService implements SummaryService {
           external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`
         });
         reject(new InternalServerError("Summary generation timed out after 60 seconds"));
-      }, 60000);
+      }, this.hasGenerated ? 60_000 : firstRunPadding);
 
       const wrappedResolve = (value: string) => {
         clearTimeout(timeoutId);
@@ -164,15 +166,14 @@ export class LlamaLLMService implements SummaryService {
       const session = await getSession();
       
       console.log("[generateSummary] Starting prompt generation...");
-      const promptStart = Date.now();
+      const t0 = Date.now();
       
-      const reply = await session.prompt(prompt, {
-        maxTokens: 30,  // Reduced for faster generation
-        temperature: 0.3,  // Reduced for more deterministic output
-      });
+     const reply = await session.prompt(prompt, {
+      maxTokens:   30,      // tight budget → faster
+      temperature: 0.3,     // more deterministic
+    });
       
-      const promptTime = Date.now() - promptStart;
-      console.log(`[generateSummary] Prompt completed in ${promptTime}ms`);
+      console.log(`[generateSummary] Prompt completed in ${Date.now() - t0} ms`);
       console.log(`[generateSummary] Raw reply: "${reply}"`);
 
       const cleaned =
@@ -181,17 +182,17 @@ export class LlamaLLMService implements SummaryService {
           .split(".")[0]
           .trim() + ".";
       
-      const result = cleaned.endsWith(".") ? cleaned : cleaned + ".";
-      console.log(`[generateSummary] Cleaned result: "${result}"`);
-      return result;
+      console.log(`[generateSummary] Cleaned result: "${cleaned}"`);
+      this.hasGenerated = true;
+
+      return cleaned;
     } catch (err) {
-      console.error("[LlamaLLMService] generation error", err);
+      console.error("[LlamaLLMService] generation error → falling back", err);
       
-      // Fallback to simple text truncation
-      console.log("[generateSummary] Using fallback summary");
-      const words = text.trim().split(/\s+/);
-      const summary = words.slice(0, 20).join(' ') + (words.length > 20 ? '...' : '.');
-      return `Summary: ${summary}`;
+      // fallback: truncate original text to 20 words
+      const words    = text.trim().split(/\s+/);
+      const fallback = words.slice(0, 20).join(" ") + (words.length > 20 ? "…" : ".");
+      return `Summary: ${fallback}`;
     }
   }
 
