@@ -66,7 +66,7 @@ src/
 ### 1. Clone and Install Dependencies
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/afscomercial/housenumbers-api.git
 cd housenumbers-api
 nvm use  # Use Node.js version from .nvmrc
 npm install
