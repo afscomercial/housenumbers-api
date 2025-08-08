@@ -109,7 +109,7 @@ AUTH_PASSWORD=secure_password_123
 DATABASE_PATH=./data/database.sqlite
 
 # AI Model
-MODEL_PATH=./models/llama-2-7b-chat.Q4_K_S.gguf
+MODEL_PATH=./models/phi-2.Q4_0.gguf
 MODEL_CONTEXT_SIZE=2048
 MODEL_GPU_LAYERS=0  # Set to higher value if you have GPU support
 ```

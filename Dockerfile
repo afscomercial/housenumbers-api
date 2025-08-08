@@ -28,7 +28,7 @@ USER nodejs
 
 # --------- default envs (override in Railway Variables) ----------
 ENV NODE_ENV=production \
-    MODEL_PATH=/app/models/llama-2-7b-chat.Q4_K_S.gguf \
+    MODEL_PATH=/app/models/phi-2.Q4_0.gguf \
     MODEL_CONTEXT_SIZE=2048 \
     MODEL_GPU_LAYERS=0 \
     AUTH_PASSWORD=password \

@@ -12,7 +12,7 @@ type GetLlamaFn = typeof import("node-llama-cpp").getLlama;
 // --------------------------------------------------------------------
 const MODEL_PATH =
   process.env.MODEL_PATH ||
-  path.resolve(__dirname, "../../../models/llama-2-7b-chat.Q4_K_S.gguf");
+  path.resolve(__dirname, "../../../models/phi-2.Q4_0.gguf");
 const CONTEXT_SIZE = 256;  // Much smaller for faster inference
 
 // Force CPU threading configuration for Railway
