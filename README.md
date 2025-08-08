@@ -280,23 +280,25 @@ Once the server is running, visit:
 4. Ensure all tests pass
 5. Submit a pull request
 
-## License
 
-MIT License - see LICENSE file for details.
 
-## Troubleshooting
+## Post-challenge reflection
 
-### Common Issues
+### Current Trade-offs
 
-1. **OpenAI API errors**: Check your API key and billing status
-2. **Rate limiting**: Implement exponential backoff for API calls
-3. **Port conflicts**: Change the PORT environment variable
-4. **Database issues**: Check file permissions for the data directory
+- **SQLite**: Using SQLite for development simplicity and easy setup
+- **Single AI Provider**: Dependency on OpenAI creates vendor lock-in risk and potential cost/availability issues at scale
+- **JWT Storage**: Simple JWT implementation without refresh tokens prioritizes development speed over enterprise-grade security
+- **GPT-3.5-turbo**: Using GPT-3.5 for cost efficiency (~$0.002/1K tokens)
+- **24-hour JWT Expiration**: Balance between user convenience and security exposure
 
-### Support
+### Future Work & Improvements
 
-For issues and questions, please check:
-1. This README
-2. API documentation at `/api-docs`
-3. Application logs
-4. GitHub issues
+- **GitHub Actions Workflows**: Set up automated testing, linting, and deployment pipelines
+- **PostgreSQL Migration**: Replace SQLite with PostgreSQL for production scalability
+- **Refresh Token System**: Implement refresh tokens for enhanced JWT security
+- **Rate Limiting Per User**: Replace global rate limiting with user-specific limits
+- **Multiple AI Providers**: Support for GPT-4, Claude, Gemini with fallback mechanisms
+- **Custom Model Selection**: Allow users to choose different AI models per request
+- **Local Model Deployment**: Replace external OpenAI API dependency with self-hosted open source models
+  
