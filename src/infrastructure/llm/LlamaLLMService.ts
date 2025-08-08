@@ -13,12 +13,12 @@ type GetLlamaFn = typeof import("node-llama-cpp").getLlama;
 const MODEL_PATH =
   process.env.MODEL_PATH ||
   path.resolve(__dirname, "../../../models/llama-2-7b-chat.Q4_K_S.gguf");
-const CONTEXT_SIZE = 2048;
+const CONTEXT_SIZE = 512;  // Much smaller for faster inference
 
 // Force CPU threading configuration for Railway
-process.env.LLAMA_NUM_THREADS = "16"; // Use half of available vCPUs
-process.env.LLAMA_BATCH_SIZE = "512"; // Reduce batch size
-process.env.OMP_NUM_THREADS = "16"; // OpenMP threads
+process.env.LLAMA_NUM_THREADS = "32"; // Use all available vCPUs
+process.env.LLAMA_BATCH_SIZE = "128"; // Much smaller batch size
+process.env.OMP_NUM_THREADS = "32"; // OpenMP threads
 
 // --------------------------------------------------------------------
 // Lazy ES-module loader — only hits import() once
