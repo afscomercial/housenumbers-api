@@ -4,11 +4,12 @@
 
 You need to set these environment variables in your Railway project:
 
-### Security (REQUIRED)
+### Required Environment Variables
 ```
 JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
 AUTH_USERNAME=admin
 AUTH_PASSWORD=your_secure_admin_password_here
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ### Optional Configuration
@@ -17,9 +18,6 @@ NODE_ENV=production
 PORT=3000
 JWT_EXPIRES_IN=24h
 DATABASE_PATH=/app/data/database.sqlite
-MODEL_PATH=/app/models/phi-2.Q4_0.gguf
-MODEL_CONTEXT_SIZE=2048
-MODEL_GPU_LAYERS=0
 API_URL=${{RAILWAY_STATIC_URL}}
 ```
 
@@ -31,18 +29,19 @@ API_URL=${{RAILWAY_STATIC_URL}}
 2. **Production mode**: `synchronize: false` - Tables are created on first run via TypeORM initialization
 3. **Default user seeding**: Automatically creates the admin user on startup if it doesn't exist
 
-## Model File Handling
+## AI Service Configuration
 
+The application now uses **OpenAI GPT-3.5-turbo** for text summarization instead of local models.
 
-The Dockerfile expects the LLM model file to be present at:
-```
-/app/models/phi-2.Q4_0.gguf
-```
+**Benefits:**
+- No model files to manage
+- Fast and reliable API responses
+- Lower resource requirements
+- Better scalability
 
-**Railway Configuration Optimizations:**
-- Build resources: 6GB RAM, 6 vCPU for compilation
-- Runtime resources: 4GB RAM, 4 vCPU for model inference  
-- Model file is included in Docker image (3.8GB)
+**Railway Configuration:**
+- Build resources: 2GB RAM, 2 vCPU for compilation
+- Runtime resources: 1GB RAM, 1 vCPU for API service
 
 
 
@@ -55,8 +54,9 @@ The Dockerfile expects the LLM model file to be present at:
 
 2. **Set Required Environment Variables** (in Railway dashboard)
    - `JWT_SECRET` (generate a secure random string)
-   - `AUTH_USERNAME` (default admin user)
+   - `AUTH_USERNAME` (default admin user)  
    - `AUTH_PASSWORD` (secure password for admin)
+   - `OPENAI_API_KEY` (your OpenAI API key)
 
 3. **Deploy**
    ```bash

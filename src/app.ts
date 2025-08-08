@@ -8,7 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import { AppDataSource } from './infrastructure/database/DataSource';
 import { TypeOrmSnippetRepository } from './infrastructure/database/repositories/TypeOrmSnippetRepository';
 import { TypeOrmUserRepository } from './infrastructure/database/repositories/TypeOrmUserRepository';
-import { LlamaLLMService } from './infrastructure/llm/LlamaLLMService';
+import { OpenAILLMService } from './infrastructure/llm/OpenAILLMService';
 import { JWTService } from './infrastructure/auth/JWTService';
 
 import { CreateSnippetUseCase } from './application/use-cases/CreateSnippetUseCase';
@@ -28,7 +28,7 @@ import { UserSeeder } from './shared/utils/seedUser';
 export class App {
   public app: express.Application;
   private jwtService: JWTService;
-  private llamaService: LlamaLLMService;
+  private openaiService: OpenAILLMService;
 
   constructor() {
     this.app = express();
@@ -44,8 +44,8 @@ export class App {
       );
       console.log('JWT Service initialized');
       
-      this.llamaService = new LlamaLLMService();
-      console.log('Llama Service initialized');
+      this.openaiService = new OpenAILLMService();
+      console.log('OpenAI Service initialized');
       
       await this.initializeDatabase();
       console.log('Database initialized');
@@ -102,7 +102,7 @@ export class App {
     const userRepository = new TypeOrmUserRepository();
 
     // Services
-    const summaryService = new SummaryService(this.llamaService);
+    const summaryService = new SummaryService(this.openaiService);
 
     // Use Cases
     const createSnippetUseCase = new CreateSnippetUseCase(snippetRepository, summaryService);
@@ -204,8 +204,8 @@ export class App {
     if (AppDataSource.isInitialized) {
       await AppDataSource.destroy();
     }
-    if (this.llamaService) {
-      await this.llamaService.dispose();
+    if (this.openaiService) {
+      await this.openaiService.dispose();
     }
   }
 }

@@ -1,40 +1,30 @@
 # syntax=docker/dockerfile:1
 FROM node:20-slim
 
-# --------- basic build deps for node-llama-cpp native addon + curl ----------
-RUN apt-get update && \
-    apt-get install -y python3 make g++ curl && \
-    rm -rf /var/lib/apt/lists/*
-
-# --------- app source ----------
 WORKDIR /app
-COPY package*.json tsconfig.json ./
-RUN npm ci --omit=dev
 
-COPY src ./src
-RUN npm run build         # outputs to dist/
-
-# --------- runtime downloader entrypoint ----------
-COPY scripts/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-# --------- non-root user ----------
+# Create non-root user and data directory
 RUN useradd --system --uid 1001 nodejs \
-&& mkdir -p /app/models /app/data \
- && chown -R nodejs:nodejs /app  
+    && mkdir -p /app/data \
+    && chown -R nodejs:nodejs /app
 
+# Copy package files and install dependencies
+COPY package*.json tsconfig.json ./
+RUN npm ci
+
+# Copy source & build
+COPY src ./src
+RUN npm run build
+
+# Switch to non-root user
 USER nodejs
 
-
-# --------- default envs (override in Railway Variables) ----------
+# Set environment variables (no model-related env vars)
 ENV NODE_ENV=production \
-    MODEL_PATH=/app/models/phi-2.Q4_0.gguf \
-    MODEL_CONTEXT_SIZE=2048 \
-    MODEL_GPU_LAYERS=0 \
     AUTH_PASSWORD=password \
     AUTH_USERNAME=admin \
     JWT_SECRET=dsujn324daw \
     JWT_EXPIRES_IN=24h
 
 EXPOSE 3000
-CMD ["/app/entrypoint.sh"]
+CMD ["node", "dist/index.js"]

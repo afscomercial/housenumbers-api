@@ -1,10 +1,10 @@
 # Housenumbers API
 
-A chat AI API for text summarization built with clean architecture, TypeScript, and Express.js. The API uses a quantized LLM (Llama-2-7b-chat) to automatically generate summaries of provided text snippets.
+A chat AI API for text summarization built with clean architecture, TypeScript, and Express.js. The API uses OpenAI's GPT-3.5-turbo to automatically generate summaries of provided text snippets.
 
 ## Features
 
-- AI-powered text summarization using Llama-2-7b-chat
+- AI-powered text summarization using OpenAI GPT-3.5-turbo
 - Clean Architecture with clear separation of concerns
 - Test-Driven Development (TDD) with Jest
 - JWT-based authentication
@@ -28,7 +28,7 @@ src/
 │   └── use-cases/        # Use case implementations
 ├── infrastructure/       # Frameworks & drivers
 │   ├── database/         # Database implementation
-│   ├── llm/             # LLM service implementation
+│   ├── llm/             # LLM service implementation (OpenAI)
 │   └── auth/            # Authentication implementation
 ├── presentation/         # Interface adapters
 │   ├── controllers/     # HTTP controllers
@@ -57,9 +57,9 @@ src/
 
 ## Prerequisites
 
-- Node.js 22+ (use .nvmrc)
+- Node.js 20+ (use .nvmrc)
 - Docker and Docker Compose
-- The Llama-2-7b-chat quantized model (see setup below)
+- OpenAI API key
 
 ## Setup
 
@@ -67,25 +67,12 @@ src/
 
 ```bash
 git clone <repository-url>
-cd housenumbers
+cd housenumbers-api
 nvm use  # Use Node.js version from .nvmrc
 npm install
 ```
 
-### 2. Download the AI Model
-
-Download the quantized Llama-2 model:
-
-```bash
-# Create models directory
-mkdir -p models
-
-# Download the model (approximately 3.8GB)
-curl -L -o models/phi-2.Q4_0.gguf \
-  "https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/phi-2.Q4_0.gguf?download=true"
-```
-
-### 3. Environment Configuration
+### 2. Environment Configuration
 
 Copy the example environment file and configure:
 
@@ -108,13 +95,11 @@ AUTH_PASSWORD=secure_password_123
 # Database
 DATABASE_PATH=./data/database.sqlite
 
-# AI Model
-MODEL_PATH=./models/phi-2.Q4_0.gguf
-MODEL_CONTEXT_SIZE=2048
-MODEL_GPU_LAYERS=0  # Set to higher value if you have GPU support
+# OpenAI API
+OPENAI_API_KEY=sk-your-openai-api-key-here
 ```
 
-### 4. Run Database Migrations
+### 3. Run Database Migrations
 
 ```bash
 npm run migrate
@@ -179,8 +164,8 @@ docker run -p 3000:3000 \
   -e JWT_SECRET="your_secret" \
   -e AUTH_USERNAME="admin" \
   -e AUTH_PASSWORD="your_password" \
+  -e OPENAI_API_KEY="sk-your-api-key" \
   -v $(pwd)/data:/app/data \
-  -v $(pwd)/models:/app/models \
   housenumbers-api
 ```
 
@@ -188,11 +173,13 @@ docker run -p 3000:3000 \
 
 1. Connect your GitHub repository to Railway
 2. Set environment variables in Railway dashboard:
-   - `JWT_SECRET`
-   - `AUTH_USERNAME`
-   - `AUTH_PASSWORD`
-   - Other variables as needed
-3. Ensure the AI model is available in your deployment (you may need to upload it separately or download it during deployment)
+   - `JWT_SECRET` (generate a secure random string)
+   - `AUTH_USERNAME` (default admin user)
+   - `AUTH_PASSWORD` (secure password for admin)
+   - `OPENAI_API_KEY` (your OpenAI API key)
+3. Deploy with `railway up`
+
+See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for detailed deployment instructions.
 
 ## Usage Examples
 
@@ -231,7 +218,7 @@ Response:
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
   "text": "Artificial Intelligence (AI) refers to...",
-  "summary": "AI simulates human intelligence in machines, enabling learning and problem-solving capabilities.",
+  "summary": "AI simulates human intelligence in machines, enabling learning and problem-solving capabilities to achieve specific goals.",
   "createdAt": "2023-01-01T00:00:00.000Z",
   "updatedAt": "2023-01-01T00:00:00.000Z"
 }
@@ -259,18 +246,31 @@ Once the server is running, visit:
 
 ## Performance Considerations
 
-- The AI model requires significant RAM (4-8GB recommended)
-- First request may take longer due to model initialization
-- Consider GPU acceleration for better performance (set `MODEL_GPU_LAYERS` > 0)
-- Use appropriate `MODEL_CONTEXT_SIZE` based on your memory constraints
+- **Fast Response Times**: OpenAI API typically responds in 1-3 seconds
+- **No Local Resources**: No need for GPU or large amounts of RAM
+- **Scalable**: Handles concurrent requests efficiently
+- **Cost-Effective**: Pay per API call instead of maintaining infrastructure
 
 ## Security
 
 - Change default username/password in production
 - Use a strong JWT secret
+- Keep your OpenAI API key secure and never commit it to version control
 - Enable HTTPS in production
 - Configure appropriate rate limiting
 - Review CORS settings for production use
+
+## OpenAI Configuration
+
+### API Key Setup
+1. Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Add it to your environment variables as `OPENAI_API_KEY`
+3. Monitor usage on OpenAI's dashboard
+
+### Cost Considerations
+- GPT-3.5-turbo: ~$0.002 per 1K tokens
+- Average summary: ~100-200 tokens
+- Estimated cost: ~$0.0002-0.0004 per summary
 
 ## Contributing
 
@@ -288,8 +288,8 @@ MIT License - see LICENSE file for details.
 
 ### Common Issues
 
-1. **Model loading fails**: Ensure the model file is downloaded and path is correct
-2. **Memory issues**: Reduce `MODEL_CONTEXT_SIZE` or add more RAM
+1. **OpenAI API errors**: Check your API key and billing status
+2. **Rate limiting**: Implement exponential backoff for API calls
 3. **Port conflicts**: Change the PORT environment variable
 4. **Database issues**: Check file permissions for the data directory
 
