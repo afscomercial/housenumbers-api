@@ -79,6 +79,13 @@ async function getSession(): Promise<LlamaChatSession> {
   chatSession = new LlamaChatSession({
     contextSequence: context.getSequence(),
   });
+
+  try {
+    await chatSession.prompt("Hello", { maxTokens: 1 });
+    console.log("[getSession] Warm-up prompt completed");
+  } catch (e) {
+    console.warn("[getSession] Warm-up prompt failed (ignored):", e);
+  }
   
   const totalTime = Date.now() - startTime;
   console.log(`[getSession] Chat session initialized successfully in ${totalTime}ms`);
@@ -112,7 +119,7 @@ export class LlamaLLMService implements SummaryService {
           heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
           external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`
         });
-        reject(new InternalServerError("Summary generation timed out after 60 seconds"));
+        reject(new InternalServerError(`Summary generation timed out after ${this.hasGenerated ? 60 : 180} seconds`));
       }, this.hasGenerated ? 60_000 : firstRunPadding);
 
       const wrappedResolve = (value: string) => {
