@@ -14,6 +14,7 @@ import { JWTService } from './infrastructure/auth/JWTService';
 import { CreateSnippetUseCase } from './application/use-cases/CreateSnippetUseCase';
 import { GetSnippetUseCase } from './application/use-cases/GetSnippetUseCase';
 import { GetAllSnippetsUseCase } from './application/use-cases/GetAllSnippetsUseCase';
+import { DeleteSnippetUseCase } from './application/use-cases/DeleteSnippetUseCase';
 import { AuthenticateUserUseCase } from './application/use-cases/AuthenticateUserUseCase';
 import { SummaryService } from './application/services/SummaryService';
 
@@ -83,17 +84,19 @@ export class App {
   }
 
   private async setupMiddlewares(): Promise<void> {
-    this.app.use(helmet());
+    // Temporarily disabled helmet to debug body parsing issue
+    // this.app.use(helmet());
     this.app.use(cors());
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true }));
-
-    const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
-      message: 'Too many requests from this IP, please try again later.',
-    });
-    this.app.use(limiter);
+    
+    // Temporarily disabled rate limiter to debug body parsing issue
+    // const limiter = rateLimit({
+    //   windowMs: 15 * 60 * 1000, // 15 minutes
+    //   max: 100, // limit each IP to 100 requests per windowMs
+    //   message: 'Too many requests from this IP, please try again later.',
+    // });
+    // this.app.use(limiter);
   }
 
   private async setupRoutes(): Promise<void> {
@@ -108,6 +111,7 @@ export class App {
     const createSnippetUseCase = new CreateSnippetUseCase(snippetRepository, summaryService);
     const getSnippetUseCase = new GetSnippetUseCase(snippetRepository);
     const getAllSnippetsUseCase = new GetAllSnippetsUseCase(snippetRepository);
+    const deleteSnippetUseCase = new DeleteSnippetUseCase(snippetRepository);
     const authenticateUserUseCase = new AuthenticateUserUseCase(userRepository);
 
     // Controllers
@@ -115,7 +119,8 @@ export class App {
     const snippetController = new SnippetController(
       createSnippetUseCase,
       getSnippetUseCase,
-      getAllSnippetsUseCase
+      getAllSnippetsUseCase,
+      deleteSnippetUseCase
     );
 
     // Routes

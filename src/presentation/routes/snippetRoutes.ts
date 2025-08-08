@@ -46,6 +46,12 @@ export const createSnippetRoutes = (
    *       500:
    *         description: Internal server error
    */
+  // Test endpoint without auth to debug body parsing
+  router.post('/test', (req, res) => {
+    console.log('Test endpoint - body:', req.body);
+    res.json({ received: req.body, success: true });
+  });
+
   router.post('/', authMiddleware, (req, res, next) => 
     snippetController.createSnippet(req, res, next)
   );
@@ -106,6 +112,36 @@ export const createSnippetRoutes = (
    */
   router.get('/', authMiddleware, (req, res, next) => 
     snippetController.getAllSnippets(req, res, next)
+  );
+
+  /**
+   * @swagger
+   * /snippets/{id}:
+   *   delete:
+   *     summary: Delete a snippet by ID
+   *     tags: [Snippets]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Snippet ID
+   *     responses:
+   *       204:
+   *         description: Snippet deleted successfully
+   *       400:
+   *         description: Invalid ID format
+   *       401:
+   *         description: Unauthorized
+   *       404:
+   *         description: Snippet not found
+   */
+  router.delete('/:id', authMiddleware, (req, res, next) => 
+    snippetController.deleteSnippet(req, res, next)
   );
 
   return router;

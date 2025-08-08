@@ -7,8 +7,7 @@ export class OpenAILLMService implements SummaryService {
 
   constructor() {
     const apiKey =
-      process.env.OPENAI_API_KEY ||
-      "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";
+      process.env.OPENAI_API_KEY;
     if (!apiKey) {
       throw new Error("OPENAI_API_KEY environment variable is required");
     }
@@ -41,7 +40,7 @@ export class OpenAILLMService implements SummaryService {
           },
         ],
         max_tokens: 60,
-        temperature: 0.3,
+        temperature: 0.5,
       });
 
       const summary = completion.choices[0]?.message?.content?.trim();
