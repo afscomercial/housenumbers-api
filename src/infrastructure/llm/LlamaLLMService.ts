@@ -14,7 +14,11 @@ const MODEL_PATH =
   process.env.MODEL_PATH ||
   path.resolve(__dirname, "../../../models/llama-2-7b-chat.Q4_K_S.gguf");
 const CONTEXT_SIZE = 2048;
-process.env.LLAMA_NUM_THREADS ||= "8"; // optional override
+
+// Force CPU threading configuration for Railway
+process.env.LLAMA_NUM_THREADS = "16"; // Use half of available vCPUs
+process.env.LLAMA_BATCH_SIZE = "512"; // Reduce batch size
+process.env.OMP_NUM_THREADS = "16"; // OpenMP threads
 
 // --------------------------------------------------------------------
 // Lazy ES-module loader — only hits import() once
@@ -52,12 +56,17 @@ async function getSession(): Promise<LlamaChatSession> {
   
   console.log("[getSession] Getting Llama instance...");
   const startTime = Date.now();
-  const llama = await (getLlama as GetLlamaFn)();
+  const llama = await (getLlama as GetLlamaFn)({
+    logLevel: "info" as any
+  });
   console.log(`[getSession] Llama instance created in ${Date.now() - startTime}ms`);
 
   console.log("[getSession] Loading model...");
   const modelStartTime = Date.now();
-  const model = await llama.loadModel({ modelPath: MODEL_PATH });
+  const model = await llama.loadModel({ 
+    modelPath: MODEL_PATH,
+    gpuLayers: 0, // Force CPU only
+  });
   console.log(`[getSession] Model loaded in ${Date.now() - modelStartTime}ms`);
 
   console.log(`[getSession] Creating context with size ${CONTEXT_SIZE}...`);
