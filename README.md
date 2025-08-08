@@ -81,8 +81,8 @@ Download the quantized Llama-2 model:
 mkdir -p models
 
 # Download the model (approximately 3.8GB)
-curl -L -o models/llama-2-7b-chat.Q4_K_S.gguf \
-  "https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_S.gguf?download=true"
+curl -L -o models/phi-2.Q4_0.gguf \
+  "https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/phi-2.Q4_0.gguf?download=true"
 ```
 
 ### 3. Environment Configuration

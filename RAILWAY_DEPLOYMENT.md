@@ -36,7 +36,7 @@ API_URL=${{RAILWAY_STATIC_URL}}
 
 The Dockerfile expects the LLM model file to be present at:
 ```
-/app/models/llama-2-7b-chat.Q4_K_S.gguf
+/app/models/phi-2.Q4_0.gguf
 ```
 
 **Railway Configuration Optimizations:**
